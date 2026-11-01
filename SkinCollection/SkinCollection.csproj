@@ -1,0 +1,80 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>SkinCollection</AssemblyName>
+    <RootNamespace>SkinCollection</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <!-- The single source of the version: Plugin.cs reads it via the generated PluginInfo, and the
+         Thunderstore package target fails if thunderstore/manifest.json disagrees. -->
+    <Version>1.0.0</Version>
+    <DebugType>portable</DebugType>
+    <!-- Record /_/ instead of the local checkout path (e.g. the PDB path inside the DLL). -->
+    <Deterministic>true</Deterministic>
+    <PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\'))=/_/</PathMap>
+    <GenerateDependencyFile>false</GenerateDependencyFile>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+
+    <!-- Override with: dotnet build -p:GamePath="D:\...\How to Fish" -->
+    <GamePath Condition="'$(GamePath)' == ''">C:\Program Files (x86)\Steam\steamapps\common\How to Fish\How to Fish</GamePath>
+    <LibDir>$(MSBuildThisFileDirectory)..\lib\</LibDir>
+    <PluginDir>$(GamePath)\BepInEx\plugins\SkinCollection</PluginDir>
+  </PropertyGroup>
+
+  <!-- Game / loader DLLs copied from the local install into lib/ (not redistributed). -->
+  <ItemGroup>
+    <Reference Include="BepInEx" HintPath="$(LibDir)BepInEx.dll" Private="false" />
+    <Reference Include="0Harmony" HintPath="$(LibDir)0Harmony.dll" Private="false" />
+    <Reference Include="Assembly-CSharp" HintPath="$(LibDir)Assembly-CSharp.dll" Private="false" />
+    <Reference Include="Assembly-CSharp-firstpass" HintPath="$(LibDir)Assembly-CSharp-firstpass.dll" Private="false" />
+    <Reference Include="FishNet.Runtime" HintPath="$(LibDir)FishNet.Runtime.dll" Private="false" />
+    <Reference Include="GameKit.Dependencies" HintPath="$(LibDir)GameKit.Dependencies.dll" Private="false" />
+    <Reference Include="UnityEngine" HintPath="$(LibDir)UnityEngine.dll" Private="false" />
+    <Reference Include="UnityEngine.CoreModule" HintPath="$(LibDir)UnityEngine.CoreModule.dll" Private="false" />
+    <Reference Include="UnityEngine.UI" HintPath="$(LibDir)UnityEngine.UI.dll" Private="false" />
+    <Reference Include="UnityEngine.UIModule" HintPath="$(LibDir)UnityEngine.UIModule.dll" Private="false" />
+    <Reference Include="UnityEngine.TextRenderingModule" HintPath="$(LibDir)UnityEngine.TextRenderingModule.dll" Private="false" />
+    <Reference Include="Unity.TextMeshPro" HintPath="$(LibDir)Unity.TextMeshPro.dll" Private="false" />
+    <Reference Include="Unity.InputSystem" HintPath="$(LibDir)Unity.InputSystem.dll" Private="false" />
+    <Reference Include="Unity.Localization" HintPath="$(LibDir)Unity.Localization.dll" Private="false" />
+    <Reference Include="UnityEngine.UIElementsModule" HintPath="$(LibDir)UnityEngine.UIElementsModule.dll" Private="false" />
+  </ItemGroup>
+
+  <Target Name="GeneratePluginInfo" BeforeTargets="CoreCompile">
+    <PropertyGroup>
+      <PluginInfoFile>$(IntermediateOutputPath)PluginInfo.g.cs</PluginInfoFile>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(PluginInfoFile)" Overwrite="true" WriteOnlyWhenDifferent="true"
+                      Lines="namespace SkinCollection { internal static class PluginInfo { public const string Version = &quot;$(Version)&quot;%3B } }" />
+    <ItemGroup>
+      <Compile Include="$(PluginInfoFile)" />
+      <FileWrites Include="$(PluginInfoFile)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="CopyToPlugins" AfterTargets="Build" Condition="Exists('$(GamePath)\BepInEx')">
+    <Copy SourceFiles="$(TargetPath);$(TargetDir)$(TargetName).pdb" DestinationFolder="$(PluginDir)" SkipUnchangedFiles="true" />
+    <Message Importance="high" Text="Copied $(TargetFileName) to $(PluginDir)" />
+  </Target>
+
+  <!-- Release builds also produce dist/SkinCollection-<version>.zip, ready to upload to Thunderstore. -->
+  <PropertyGroup>
+    <RepoDir>$(MSBuildThisFileDirectory)..\</RepoDir>
+    <ThunderstoreDir>$(RepoDir)thunderstore\</ThunderstoreDir>
+    <PackageStagingDir>$(BaseIntermediateOutputPath)package\</PackageStagingDir>
+  </PropertyGroup>
+
+  <Target Name="PackageThunderstore" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+    <Error Condition="!$([System.IO.File]::ReadAllText('$(ThunderstoreDir)manifest.json').Contains('&quot;version_number&quot;: &quot;$(Version)&quot;'))"
+           Text="thunderstore/manifest.json version_number does not match &lt;Version&gt; $(Version)" />
+    <RemoveDir Directories="$(PackageStagingDir)" />
+    <Copy SourceFiles="$(ThunderstoreDir)manifest.json;$(ThunderstoreDir)icon.png;$(RepoDir)README.md;$(RepoDir)CHANGELOG.md"
+          DestinationFolder="$(PackageStagingDir)" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(PackageStagingDir)plugins\SkinCollection" />
+    <MakeDir Directories="$(RepoDir)dist" />
+    <ZipDirectory SourceDirectory="$(PackageStagingDir)" DestinationFile="$(RepoDir)dist\SkinCollection-$(Version).zip" Overwrite="true" />
+    <Message Importance="high" Text="Packaged dist\SkinCollection-$(Version).zip" />
+  </Target>
+
+</Project>

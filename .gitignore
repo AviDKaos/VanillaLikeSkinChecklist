@@ -1,0 +1,9 @@
+lib/
+decompiled/
+bin/
+obj/
+*.user
+.vs/
+.venv/
+dist/
+__pycache__/
