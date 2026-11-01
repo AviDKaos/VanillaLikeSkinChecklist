@@ -26,6 +26,10 @@ namespace SkinCollection
         public const string HintPress = "HintPress";
         public const string HintHold = "HintHold";
         public const string HintUnbound = "HintUnbound";
+        public const string Island = "Island";
+        public const string Islands = "Islands";
+        public const string BowIsland = "BowIsland";
+        public const string ListSeparator = "ListSeparator";
 
         public static event Action LanguageChanged;
 
@@ -323,6 +327,74 @@ namespace SkinCollection
                 ["sv"] = "Välj en knapp för \"{0}\" i kontrollinställningarna för att se dina utseenden.",
                 ["tr"] = "Görünümlerini görmek için kontrol ayarlarından \"{0}\" için bir tuş ata.",
                 ["uk"] = "Призначте кнопку для «{0}» у налаштуваннях керування, щоб побачити свої образи.",
+            },
+            // Where a skin can be won. "Island" is the game's own menu label; {0} is one island number...
+            [Island] = new Dictionary<string, string>
+            {
+                ["en"] = "Island {0}",
+                ["zh-CN"] = "{0}号岛",
+                ["zh-TW"] = "{0}號島",
+                ["fr"] = "Île {0}",
+                ["de"] = "Insel {0}",
+                ["it"] = "Isola {0}",
+                ["ja"] = "島{0}",
+                ["ko"] = "섬 {0}",
+                ["pl"] = "Wyspa {0}",
+                ["pt-BR"] = "Ilha {0}",
+                ["ru"] = "Остров {0}",
+                ["es-MX"] = "Isla {0}",
+                ["es-ES"] = "Isla {0}",
+                ["sv"] = "Ö {0}",
+                ["tr"] = "Ada {0}",
+                ["uk"] = "Острів {0}",
+            },
+            // ...or several, joined with ListSeparator ("Islands 2, 3").
+            [Islands] = new Dictionary<string, string>
+            {
+                ["en"] = "Islands {0}",
+                ["zh-CN"] = "{0}号岛",
+                ["zh-TW"] = "{0}號島",
+                ["fr"] = "Îles {0}",
+                ["de"] = "Inseln {0}",
+                ["it"] = "Isole {0}",
+                ["ja"] = "島{0}",
+                ["ko"] = "섬 {0}",
+                ["pl"] = "Wyspy {0}",
+                ["pt-BR"] = "Ilhas {0}",
+                ["ru"] = "Острова {0}",
+                ["es-MX"] = "Islas {0}",
+                ["es-ES"] = "Islas {0}",
+                ["sv"] = "Öar {0}",
+                ["tr"] = "Adalar {0}",
+                ["uk"] = "Острови {0}",
+            },
+            // The small island that sells the Bow (the game's own word for it); its machine only gives Bow skins.
+            [BowIsland] = new Dictionary<string, string>
+            {
+                ["en"] = "Bow island",
+                ["zh-CN"] = "弓之岛",
+                ["zh-TW"] = "弓之島",
+                ["fr"] = "Île de l’arc",
+                ["de"] = "Bogeninsel",
+                ["it"] = "Isola dell’arco",
+                ["ja"] = "弓の島",
+                ["ko"] = "활의 섬",
+                ["pl"] = "Wyspa z łukiem",
+                ["pt-BR"] = "Ilha do arco",
+                ["ru"] = "Остров с луком",
+                ["es-MX"] = "Isla del arco",
+                ["es-ES"] = "Isla del arco",
+                ["sv"] = "Pilbågsön",
+                ["tr"] = "Yay adası",
+                ["uk"] = "Острів з луком",
+            },
+            // Other languages fall back to the English comma.
+            [ListSeparator] = new Dictionary<string, string>
+            {
+                ["en"] = ", ",
+                ["zh-CN"] = "、",
+                ["zh-TW"] = "、",
+                ["ja"] = "・",
             },
         };
 

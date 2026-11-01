@@ -24,6 +24,8 @@ namespace SkinCollection
         public string Name;
         public byte ItemId;
         public bool IsBoat;
+        /// <summary>Islands whose slot machine can roll this item's skins, in island order; see SkinCatalog.BowIsland.</summary>
+        public List<int> Islands = new List<int>();
         /// <summary>Default first, then Common, Rare, Legendary, then unobtainable; game index within each.</summary>
         public List<SkinEntry> Skins = new List<SkinEntry>();
 
@@ -54,6 +56,24 @@ namespace SkinCollection
             70,         // Sniper Rifle
             54,         // Assault Rifle
             86,         // Bow
+        };
+
+        /// <summary>Stands for the Mini1 scene: the small island where the Bow is sold.</summary>
+        public const int BowIsland = 0;
+
+        /// <summary>
+        /// Each island's slot machine prizes (SlotMachine._availableItems, plus the boat unless _excludeBoat), read
+        /// from the island scenes of 1.1.3. Only the current island's scene is ever loaded, so this can't be read at
+        /// runtime. Island1–Island5 are the main islands; the other mini islands and DevIsland have no machine.
+        /// </summary>
+        private static readonly (int Island, byte[] Prizes)[] SlotMachines =
+        {
+            (1, new byte[] { 57, 63 }),                      // Brass Knuckles, Knife
+            (2, new byte[] { 63, 66, 61, 68, BoatItemId }),  // Knife, Pistol, Fishing Rod, Shotgun, Boat
+            (3, new byte[] { 66, 69, 61, 68, BoatItemId }),  // Pistol, SMG, Fishing Rod, Shotgun, Boat
+            (4, new byte[] { 61, 69, 70, BoatItemId }),      // Fishing Rod, SMG, Sniper Rifle, Boat
+            (5, new byte[] { 61, 54, 70, BoatItemId }),      // Fishing Rod, Assault Rifle, Sniper Rifle, Boat
+            (BowIsland, new byte[] { 86 }),                  // Bow
         };
 
         private static readonly FieldInfo CurLocalSaveField = AccessTools.Field(typeof(SaveManager), "_curLocalSave");
@@ -105,7 +125,13 @@ namespace SkinCollection
 
         private static SkinGroup MakeGroup(string name, byte itemId, bool isBoat, SkinPreset preset, ICollection<byte> unlocked)
         {
-            var group = new SkinGroup { Name = name, ItemId = itemId, IsBoat = isBoat };
+            var group = new SkinGroup
+            {
+                Name = name,
+                ItemId = itemId,
+                IsBoat = isBoat,
+                Islands = SlotMachines.Where(m => m.Prizes.Contains(itemId)).Select(m => m.Island).ToList(),
+            };
             var skins = preset.Skins;
             for (int i = 0; i < skins.Count; i++)
             {
@@ -194,7 +220,7 @@ namespace SkinCollection
             {
                 owned += g.OwnedCount;
                 total += g.TotalCount;
-                log.LogInfo($"{g.Name} (id {g.ItemId}{(g.IsBoat ? ", boat" : "")}): {g.OwnedCount}/{g.TotalCount}");
+                log.LogInfo($"{g.Name} (id {g.ItemId}{(g.IsBoat ? ", boat" : "")}): {g.OwnedCount}/{g.TotalCount}, islands [{string.Join(",", g.Islands)}]");
                 foreach (var s in g.Skins)
                     log.LogInfo($"    [{(s.Owned ? "x" : " ")}] {s.Index,2} {s.Name} ({s.Rarity}){(s.Unobtainable ? " - unobtainable" : "")}");
             }

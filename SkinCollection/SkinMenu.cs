@@ -56,6 +56,9 @@ namespace SkinCollection
         private TextMeshProUGUI _titleText;
         private float _slotAnimDelay = 0.1f;
         private readonly List<SlotView> _slots = new List<SlotView>();
+        // Each label's font size as cloned, the size SetText fits from.
+        private readonly Dictionary<TextMeshProUGUI, float> _baseFontSizes = new Dictionary<TextMeshProUGUI, float>();
+        private const float MinFontScale = 0.7f;
         private bool _buildFailed;
 
         // ShaderManager.ApplyItemSkin uses keywords of the item shader, or of the boat shader when forBoat;
@@ -119,7 +122,7 @@ namespace SkinCollection
         private void OnLanguageChanged()
         {
             if (_titleText != null)
-                _titleText.text = Strings.Get(Strings.Title);
+                SetText(_titleText, Strings.Get(Strings.Title));
             if (IsOpen)
             {
                 UpdateCloseText();
@@ -246,7 +249,7 @@ namespace SkinCollection
             if (_toggleText == null)
                 return;
             string key = Input != null ? ModInput.Display(Input.ToggleUnobtainable) : "";
-            _toggleText.text = Strings.Get(ShowingUnobtainable ? Strings.HideUnobtainable : Strings.ShowUnobtainable, key).TrimEnd();
+            SetText(_toggleText, Strings.Get(ShowingUnobtainable ? Strings.HideUnobtainable : Strings.ShowUnobtainable, key).TrimEnd());
         }
 
         /// <summary>"Close [K]" or a gamepad icon, built like ThinkingUI.SetupCloseInputText but with our action.</summary>
@@ -272,7 +275,7 @@ namespace SkinCollection
             {
                 // Fall back to English below.
             }
-            _closeText.text = string.IsNullOrEmpty(text) ? "Close " + key : text;
+            SetText(_closeText, string.IsNullOrEmpty(text) ? "Close " + key : text);
         }
 
         private void Close()
@@ -397,11 +400,11 @@ namespace SkinCollection
             RenderSlots();
 
             string groupPage = page.PagesInGroup > 1 ? $" ({page.PageInGroup + 1}/{page.PagesInGroup})" : "";
-            _progressText.text = $"{group.Name}{groupPage}: {group.OwnedCount} / {group.TotalCount}";
+            SetText(_progressText, $"{group.Name}{groupPage}: {group.OwnedCount} / {group.TotalCount}");
             _progressText.color = group.OwnedCount == group.TotalCount ? GameInfo.OrangeColor : Color.white;
-            _totalText.text = Strings.Get(Strings.TotalSkins, _ownedTotal, _skinTotal);
+            SetText(_totalText, Strings.Get(Strings.TotalSkins, _ownedTotal, _skinTotal));
             _totalText.color = _ownedTotal == _skinTotal ? GameInfo.OrangeColor : Color.white;
-            _pageText.text = Strings.Get(Strings.Page, _curPage + 1, _pages.Count);
+            SetText(_pageText, Strings.Get(Strings.Page, _curPage + 1, _pages.Count));
             UpdateToggleText();
 
             if (_showRoutine != null)
@@ -449,14 +452,15 @@ namespace SkinCollection
                 return;
 
             view.Name.gameObject.SetActive(true);
-            view.Name.text = entry.Name;
+            SetText(view.Name, entry.Name);
             view.Name.color = entry.Owned ? Color.white : new Color(1f, 1f, 1f, 0.5f);
 
-            view.Worth.text = RarityLabel(entry);
+            SetText(view.Worth, RarityLabel(entry));
             view.Worth.color = RarityColor(entry);
 
+            // Where the journal says which bait catches a fish, say where the skin can be won.
             if (view.Bait != null)
-                view.Bait.text = "";
+                SetText(view.Bait, IslandsLabel(entry, group));
 
             view.Image.color = entry.Owned ? Color.white : (MissingAsSilhouette ? Color.black : new Color(0.35f, 0.35f, 0.35f, 1f));
 
@@ -495,6 +499,21 @@ namespace SkinCollection
                 case Rarity.Legendary: return Strings.Get(Strings.Legendary);
                 default: return entry.Rarity.ToString();
             }
+        }
+
+        /// <summary>"Islands 2, 3" / "Bow island"; "-" like the journal when no slot machine gives it.</summary>
+        private static string IslandsLabel(SkinEntry entry, SkinGroup group)
+        {
+            if (entry.Index == 0 || entry.Unobtainable || group.Islands.Count == 0)
+                return "-";
+            string separator = Strings.Get(Strings.ListSeparator);
+            var parts = new List<string>();
+            var main = group.Islands.Where(i => i != SkinCatalog.BowIsland).ToList();
+            if (main.Count > 0)
+                parts.Add(Strings.Get(main.Count == 1 ? Strings.Island : Strings.Islands, string.Join(separator, main)));
+            if (group.Islands.Contains(SkinCatalog.BowIsland))
+                parts.Add(Strings.Get(Strings.BowIsland));
+            return string.Join(separator, parts);
         }
 
         private static Color RarityColor(SkinEntry entry)
@@ -668,7 +687,7 @@ namespace SkinCollection
 
             _titleText = _canvasRoot.GetComponentsInChildren<TextMeshProUGUI>(true).FirstOrDefault(t => t.name == "ThinkingText");
             if (_titleText != null)
-                _titleText.text = Strings.Get(Strings.Title);
+                SetText(_titleText, Strings.Get(Strings.Title));
         }
 
         private void SetupArrows()
@@ -729,6 +748,28 @@ namespace SkinCollection
             _texture = null;
             _slots.Clear();
             _cloudy.Clear();
+            _baseFontSizes.Clear();
+        }
+
+        /// <summary>
+        /// Sets a label's text, shrinking the font (down to MinFontScale) when it wouldn't fit on one line, instead of
+        /// wrapping: e.g. Russian "Легендарный" would otherwise split mid-word. Labels that don't wrap overflow by
+        /// design in the journal and are left at their size.
+        /// </summary>
+        private void SetText(TextMeshProUGUI label, string text)
+        {
+            if (label == null)
+                return;
+            if (!_baseFontSizes.TryGetValue(label, out float size))
+                _baseFontSizes[label] = size = label.fontSize;
+            label.fontSize = size;
+            label.text = text;
+            if (string.IsNullOrEmpty(text) || label.textWrappingMode == TextWrappingModes.NoWrap)
+                return;
+            float width = label.rectTransform.rect.width - label.margin.x - label.margin.z;
+            float needed = label.GetPreferredValues(text, float.PositiveInfinity, float.PositiveInfinity).x;
+            if (width > 0f && needed > width)
+                label.fontSize = Mathf.Max(size * MinFontScale, size * width / needed);
         }
 
         /// <summary>Finds the clone of <paramref name="original"/> by walking the same sibling indices.</summary>

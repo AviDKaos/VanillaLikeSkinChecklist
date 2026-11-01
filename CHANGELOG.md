@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.0
+
+- Each skin now shows which islands' slot machines can give it, in the line where the fish journal shows the bait. Bow skins only come from the Bow island.
+- Labels too long for one line in some languages (e.g. Russian "Легендарный") now shrink slightly instead of breaking mid-word.
+
 ## 1.0.0
 
 - First release.

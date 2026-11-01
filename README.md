@@ -6,6 +6,18 @@ See which weapon and boat skins you already own and which ones you're still miss
 - One page per item: Boat, Fishing Rod, Brass Knuckles, Knife, Pistol, Shotgun, SMG, Sniper Rifle, Assault Rifle and Bow.
 - Every skin is shown on the item's 3D model. Skins you own are in full color, and missing ones are black silhouettes, like fish you haven't caught yet.
 - Skins are sorted Default → Common → Rare → Legendary, with rarity shown in the game's own colors.
+- Each skin says which islands' slot machines can give it, where the journal shows a fish's bait:
+
+  | Item | Islands |
+  |---|---|
+  | Brass Knuckles | 1 |
+  | Knife | 1, 2 |
+  | Pistol, Shotgun | 2, 3 |
+  | Fishing Rod, Boat | 2, 3, 4, 5 |
+  | SMG | 3, 4 |
+  | Sniper Rifle | 4, 5 |
+  | Assault Rifle | 5 |
+  | Bow | the small island where the Bow is sold |
 - Per-item and overall counters turn orange once complete.
 - Skins the slot machine can't give are hidden by default and **never count toward your totals**. Toggle them with `U` / D-pad Up or the on-screen button.
 

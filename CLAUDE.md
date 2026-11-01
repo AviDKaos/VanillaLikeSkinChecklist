@@ -155,6 +155,12 @@ Requirements:
   `SkinCollection`. Repo: https://github.com/AviDKaos/VanillaLikeSkinChecklist (remote `origin` with the `AviDKaos@` URL).
   Published on Thunderstore as `AviDKaos-VanillaLikeSkinChecklist` 1.0.0 (2026-11-01). A first upload under a personal
   Thunderstore team is deprecated, with removal requested, and the personal GitHub repo was deleted.
+- 1.1.0 (tested in game, not yet uploaded): per-skin island line from the slot machine pools (`SkinCatalog.SlotMachines`,
+  see the slot machine section of `docs/game-api.md`), and `SkinMenu.SetText` shrinking labels that would wrap.
+- The manual BepInEx install in the game folder was removed (2026-11-01); the user plays through r2modman. Test builds
+  go into the r2modman profile by copying `bin/Release/SkinCollection.dll` over
+  `%AppData%\r2modmanPlus-local\HowToFish\profiles\Default\BepInEx\plugins\AviDKaos-VanillaLikeSkinChecklist\SkinCollection\`.
+  `CopyToPlugins` only runs when the game folder has a `BepInEx` folder, so builds don't recreate it.
 - Upload is manual, by the user: thunderstore.io → How to Fish community → Upload, under their own team (the team
   name becomes the package namespace). Check that the dependency `BepInEx-BepInExPack-5.4.2305` is still the current
   pack there.

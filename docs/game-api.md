@@ -135,3 +135,25 @@ The game uses the **new Input System** (`PlayerInput`, `InputActionReference`). 
 `UnityEngine.InputSystem.Keyboard.current.kKey.wasPressedThisFrame` rather than legacy `UnityEngine.Input`,
 which may be disabled. Skip the hotkey while `PlayerThinking.IsThinking`, while the game is paused or while
 a text field has focus.
+
+## Slot machines (where skins drop)
+
+Each island scene has one `SlotMachine` whose serialized `_availableItems` (Item prefabs) and `_excludeBoat`
+make up its prize pool. `SlotMachineManager.RollRandom` fills 10 slots, each with a random collection from
+that pool (the boat counts as one collection unless excluded). Seven slots get `GetRandomSkinIndex(Common)`, two
+get `Rare` and one gets `Legendary`, and then a random slot wins. That makes 70 / 20 / 10 % per rarity, then an
+even split across collections and across skins of that rarity. Skins tagged `Rarity.Default` never drop.
+
+Only the current island's scene is loaded, so the pools are hard-coded in `SkinCatalog.SlotMachines`.
+Re-extract them with `tools/slot_pools.py` after game updates. Build order: 0 Game, 1–5 Island1–5,
+6 DevIsland, 7–11 Mini1–5.
+
+| Scene | Prizes | Boat |
+|---|---|---|
+| Island1 | Brass Knuckles, Knife | no |
+| Island2 | Knife, Pistol, Fishing Rod, Shotgun | yes |
+| Island3 | Pistol, SMG, Fishing Rod, Shotgun | yes |
+| Island4 | Fishing Rod, SMG, Sniper Rifle | yes |
+| Island5 | Fishing Rod, Assault Rifle, Sniper Rifle | yes |
+| Mini1 (sells the Bow) | Bow | no |
+| DevIsland (not reachable) | Brass Knuckles, Knife, Pistol | yes |
