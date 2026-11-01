@@ -153,7 +153,8 @@ Requirements:
 - Thunderstore package name: **VanillaLikeSkinChecklist** (`ThunderstorePackageName` in the csproj, checked against the
   manifest). The in-game feature/menu title stays "Skin Collection" (translated), and the DLL and plugin folder stay
   `SkinCollection`. Repo: https://github.com/AviDKaos/VanillaLikeSkinChecklist (remote `origin` with the `AviDKaos@` URL).
-  A first upload under a personal Thunderstore team was deprecated, and its removal was requested.
+  Published on Thunderstore as `AviDKaos-VanillaLikeSkinChecklist` 1.0.0 (2026-11-01). A first upload under a personal
+  Thunderstore team is deprecated, with removal requested, and the personal GitHub repo was deleted.
 - Upload is manual, by the user: thunderstore.io → How to Fish community → Upload, under their own team (the team
   name becomes the package namespace). Check that the dependency `BepInEx-BepInExPack-5.4.2305` is still the current
   pack there.
