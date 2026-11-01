@@ -155,7 +155,7 @@ Requirements:
   `SkinCollection`. Repo: https://github.com/AviDKaos/VanillaLikeSkinChecklist (remote `origin` with the `AviDKaos@` URL).
   Published on Thunderstore as `AviDKaos-VanillaLikeSkinChecklist` 1.0.0 (2026-11-01). A first upload under a personal
   Thunderstore team is deprecated, with removal requested, and the personal GitHub repo was deleted.
-- 1.1.0 (tested in game, not yet uploaded): per-skin island line from the slot machine pools (`SkinCatalog.SlotMachines`,
+- 1.1.0 (published 2026-11-01): per-skin island line from the slot machine pools (`SkinCatalog.SlotMachines`,
   see the slot machine section of `docs/game-api.md`), and `SkinMenu.SetText` shrinking labels that would wrap.
 - The manual BepInEx install in the game folder was removed (2026-11-01); the user plays through r2modman. Test builds
   go into the r2modman profile by copying `bin/Release/SkinCollection.dll` over
