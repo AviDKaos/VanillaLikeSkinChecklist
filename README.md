@@ -1,6 +1,6 @@
-# Skin Collection
+# Vanilla-like Skin Checklist
 
-See which weapon and boat skins you already own and which ones you're still missing, in a menu that looks and feels like the game's own fish journal.
+See which weapon and boat skins you already own and which ones you're still missing, in a menu that looks and feels like the game's own fish journal. In-game it's called **Skin Collection**.
 
 - **Open it with `K`**, or **hold Select** on a controller.
 - One page per item: Boat, Fishing Rod, Brass Knuckles, Knife, Pistol, Shotgun, SMG, Sniper Rifle, Assault Rifle and Bow.
@@ -51,3 +51,7 @@ The first time you play with the mod, a tip in the game's tutorial style explain
 ## Compatibility
 
 Built for How to Fish **1.1.3** with BepInExPack 5.4.2305.
+
+## Source & feedback
+
+Source code, issues and suggestions: <https://github.com/AviDKaos/VanillaLikeSkinChecklist>. Translation fixes from native speakers are especially welcome.

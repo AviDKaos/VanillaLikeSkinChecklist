@@ -1,7 +1,7 @@
 {
-  "name": "SkinCollection",
+  "name": "VanillaLikeSkinChecklist",
   "version_number": "1.0.0",
-  "website_url": "",
+  "website_url": "https://github.com/AviDKaos/VanillaLikeSkinChecklist",
   "description": "A journal-style menu (K / hold Select) showing which item and boat skins you own and which are missing. Read-only and client-side, works in any lobby, translated into all 16 game languages.",
   "dependencies": [
     "BepInEx-BepInExPack-5.4.2305"

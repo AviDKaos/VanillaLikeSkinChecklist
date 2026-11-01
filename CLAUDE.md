@@ -142,7 +142,7 @@ Requirements:
 - The version lives only in `<Version>` in `SkinCollection/SkinCollection.csproj`. A build target generates
   `PluginInfo.Version` for `Plugin.PluginVersion`. The package target fails if `thunderstore/manifest.json`'s
   `version_number` differs, so bump both.
-- `dotnet build -c Release` (in `SkinCollection/`) also writes `dist/SkinCollection-<version>.zip`, which holds
+- `dotnet build -c Release` (in `SkinCollection/`) also writes `dist/VanillaLikeSkinChecklist-<version>.zip`, which holds
   `manifest.json`, `icon.png`, `README.md`, `CHANGELOG.md` and `plugins/SkinCollection/SkinCollection.dll`. `dist/` is gitignored.
 - `thunderstore/icon.png` is original art made by `tools/make_icon.py` (Pillow). Don't ship game art.
 - **Published under the pseudonym `AviDKaos`. Never put the author's real name, personal GitHub or personal email in
@@ -150,10 +150,10 @@ Requirements:
   the author's personal one. To push, the remote URL must include the username
   (`https://AviDKaos@github.com/AviDKaos/<repo>.git`) so Git Credential Manager picks the right account; the personal
   account is the global default (`credential.https://github.com.username`).
-- Pending: the user still has to choose the package name (VanillaLikeSkinChecklist or BetterSkinChecklist) and create
-  the repo under AviDKaos. Then set the manifest `name` and `website_url`, restore a "Source & feedback" README section,
-  add the remote and push. A first upload under a personal Thunderstore team was deprecated, and its removal was
-  requested.
+- Thunderstore package name: **VanillaLikeSkinChecklist** (`ThunderstorePackageName` in the csproj, checked against the
+  manifest). The in-game feature/menu title stays "Skin Collection" (translated), and the DLL and plugin folder stay
+  `SkinCollection`. Repo: https://github.com/AviDKaos/VanillaLikeSkinChecklist (remote `origin` with the `AviDKaos@` URL).
+  A first upload under a personal Thunderstore team was deprecated, and its removal was requested.
 - Upload is manual, by the user: thunderstore.io → How to Fish community → Upload, under their own team (the team
   name becomes the package namespace). Check that the dependency `BepInEx-BepInExPack-5.4.2305` is still the current
   pack there.

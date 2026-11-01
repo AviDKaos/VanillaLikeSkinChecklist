@@ -58,23 +58,27 @@
     <Message Importance="high" Text="Copied $(TargetFileName) to $(PluginDir)" />
   </Target>
 
-  <!-- Release builds also produce dist/SkinCollection-<version>.zip, ready to upload to Thunderstore. -->
+  <!-- Release builds also produce dist/<package>-<version>.zip, ready to upload to Thunderstore. -->
   <PropertyGroup>
     <RepoDir>$(MSBuildThisFileDirectory)..\</RepoDir>
     <ThunderstoreDir>$(RepoDir)thunderstore\</ThunderstoreDir>
+    <!-- Must match "name" in thunderstore/manifest.json. -->
+    <ThunderstorePackageName>VanillaLikeSkinChecklist</ThunderstorePackageName>
     <PackageStagingDir>$(BaseIntermediateOutputPath)package\</PackageStagingDir>
   </PropertyGroup>
 
   <Target Name="PackageThunderstore" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
     <Error Condition="!$([System.IO.File]::ReadAllText('$(ThunderstoreDir)manifest.json').Contains('&quot;version_number&quot;: &quot;$(Version)&quot;'))"
            Text="thunderstore/manifest.json version_number does not match &lt;Version&gt; $(Version)" />
+    <Error Condition="!$([System.IO.File]::ReadAllText('$(ThunderstoreDir)manifest.json').Contains('&quot;name&quot;: &quot;$(ThunderstorePackageName)&quot;'))"
+           Text="thunderstore/manifest.json name does not match $(ThunderstorePackageName)" />
     <RemoveDir Directories="$(PackageStagingDir)" />
     <Copy SourceFiles="$(ThunderstoreDir)manifest.json;$(ThunderstoreDir)icon.png;$(RepoDir)README.md;$(RepoDir)CHANGELOG.md"
           DestinationFolder="$(PackageStagingDir)" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(PackageStagingDir)plugins\SkinCollection" />
     <MakeDir Directories="$(RepoDir)dist" />
-    <ZipDirectory SourceDirectory="$(PackageStagingDir)" DestinationFile="$(RepoDir)dist\SkinCollection-$(Version).zip" Overwrite="true" />
-    <Message Importance="high" Text="Packaged dist\SkinCollection-$(Version).zip" />
+    <ZipDirectory SourceDirectory="$(PackageStagingDir)" DestinationFile="$(RepoDir)dist\$(ThunderstorePackageName)-$(Version).zip" Overwrite="true" />
+    <Message Importance="high" Text="Packaged dist\$(ThunderstorePackageName)-$(Version).zip" />
   </Target>
 
 </Project>
