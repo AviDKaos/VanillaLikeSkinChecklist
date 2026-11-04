@@ -175,6 +175,17 @@ Requirements:
 - Upload is manual, by the user: thunderstore.io → How to Fish community → Upload, under their own team (the team
   name becomes the package namespace). Check that the dependency `BepInEx-BepInExPack-5.4.2305` is still the current
   pack there.
+- After each Thunderstore upload, with the user's OK (check `gh api user --jq .login` is AviDKaos), tag and release it
+  on GitHub with the same zip:
+  - `git tag -a vX.Y.Z -m "VanillaLikeSkinChecklist X.Y.Z" <commit>`, then `git push origin vX.Y.Z`;
+  - `gh release create vX.Y.Z <zip> --verify-tag --title "VanillaLikeSkinChecklist X.Y.Z" --notes-file <notes>`. The notes
+    are the version's CHANGELOG section plus `https://thunderstore.io/c/how-to-fish/p/AviDKaos/VanillaLikeSkinChecklist/v/X.Y.Z/`.
+  - The Thunderstore page stays the main link (it's also the repo's About website).
+  - v1.0.0 (371ee78), v1.1.0 (a6e665c) and v1.1.1 (0c9da5d) were tagged on 2026-11-04 with the zips downloaded back from
+    Thunderstore (`https://thunderstore.io/package/download/AviDKaos/VanillaLikeSkinChecklist/X.Y.Z/`).
+  - To match a published build to its commit, look at the DLL's `AssemblyInformationalVersion` ("X.Y.Z+<sha>", the HEAD
+    at build time, so possibly one commit before uncommitted release changes) and diff the ilspycmd output against a
+    rebuild. A byte comparison fails, because line endings change the deterministic DLL.
 
 ## Known game API
 
