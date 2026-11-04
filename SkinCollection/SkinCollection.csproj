@@ -16,10 +16,11 @@
     <GenerateDependencyFile>false</GenerateDependencyFile>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 
-    <!-- Override with: dotnet build -p:GamePath="D:\...\How to Fish" -->
-    <GamePath Condition="'$(GamePath)' == ''">C:\Program Files (x86)\Steam\steamapps\common\How to Fish\How to Fish</GamePath>
     <LibDir>$(MSBuildThisFileDirectory)..\lib\</LibDir>
-    <PluginDir>$(GamePath)\BepInEx\plugins\SkinCollection</PluginDir>
+    <!-- Test builds go to the r2modman Dev profile (see CopyToPlugins). Don't also install the released package
+         there: same GUID twice. Override with: dotnet build -p:ProfilePath="...\profiles\Other" -->
+    <ProfilePath Condition="'$(ProfilePath)' == ''">$(APPDATA)\r2modmanPlus-local\HowToFish\profiles\Dev</ProfilePath>
+    <PluginDir>$(ProfilePath)\BepInEx\plugins\SkinCollection</PluginDir>
   </PropertyGroup>
 
   <!-- Game / loader DLLs copied from the local install into lib/ (not redistributed). -->
@@ -53,9 +54,17 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="CopyToPlugins" AfterTargets="Build" Condition="Exists('$(GamePath)\BepInEx')">
-    <Copy SourceFiles="$(TargetPath);$(TargetDir)$(TargetName).pdb" DestinationFolder="$(PluginDir)" SkipUnchangedFiles="true" />
-    <Message Importance="high" Text="Copied $(TargetFileName) to $(PluginDir)" />
+  <!-- Installs the build into the Dev profile like an r2modman-imported mod, so r2modman lists it and can toggle it
+       (tools/r2modman_dev.py: files under plugins/AviDKaos-<package>/, entry in mods.yml, keeps the enabled state).
+       Without Python, falls back to a loose copy in $(PluginDir), which r2modman doesn't list. -->
+  <Target Name="CopyToPlugins" AfterTargets="Build" Condition="Exists('$(ProfilePath)\BepInEx')">
+    <Exec Command="python -I &quot;$(RepoDir)tools\r2modman_dev.py&quot; &quot;$(ProfilePath.TrimEnd('\'))&quot; AviDKaos &quot;$(ThunderstoreDir.TrimEnd('\'))&quot; &quot;$(RepoDir.TrimEnd('\'))&quot; SkinCollection &quot;$(TargetPath)&quot; &quot;$(TargetDir)$(TargetName).pdb&quot;"
+          ContinueOnError="true" StandardOutputImportance="high">
+      <Output TaskParameter="ExitCode" PropertyName="DevInstallExitCode" />
+    </Exec>
+    <Warning Condition="'$(DevInstallExitCode)' != '0'" Text="r2modman dev install failed; copied the DLL loose to $(PluginDir) instead" />
+    <Copy Condition="'$(DevInstallExitCode)' != '0'"
+          SourceFiles="$(TargetPath);$(TargetDir)$(TargetName).pdb" DestinationFolder="$(PluginDir)" SkipUnchangedFiles="true" />
   </Target>
 
   <!-- Release builds also produce dist/<package>-<version>.zip, ready to upload to Thunderstore. -->
