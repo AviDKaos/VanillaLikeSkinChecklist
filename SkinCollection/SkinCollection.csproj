@@ -55,10 +55,11 @@
   </Target>
 
   <!-- Installs the build into the Dev profile like an r2modman-imported mod, so r2modman lists it and can toggle it
-       (tools/r2modman_dev.py: files under plugins/AviDKaos-<package>/, entry in mods.yml, keeps the enabled state).
+       as "VanillaLikeSkinChecklist (Dev)" (tools/r2modman_import.py, a copy of the r2modman-mod-dev plugin's script:
+       files under plugins/AviDKaos-<package>_Dev/, entry in mods.yml, keeps the enabled state).
        Without Python, falls back to a loose copy in $(PluginDir), which r2modman doesn't list. -->
   <Target Name="CopyToPlugins" AfterTargets="Build" Condition="Exists('$(ProfilePath)\BepInEx')">
-    <Exec Command="python -I &quot;$(RepoDir)tools\r2modman_dev.py&quot; &quot;$(ProfilePath.TrimEnd('\'))&quot; AviDKaos &quot;$(ThunderstoreDir.TrimEnd('\'))&quot; &quot;$(RepoDir.TrimEnd('\'))&quot; SkinCollection &quot;$(TargetPath)&quot; &quot;$(TargetDir)$(TargetName).pdb&quot;"
+    <Exec Command="python -I &quot;$(RepoDir)tools\r2modman_import.py&quot; --profile &quot;$(ProfilePath.TrimEnd('\'))&quot; --namespace AviDKaos --package &quot;$(ThunderstoreDir.TrimEnd('\'))&quot; --file &quot;$(RepoDir)README.md=README.md&quot; --file &quot;$(RepoDir)CHANGELOG.md=CHANGELOG.md&quot; --file &quot;$(TargetPath)=plugins\SkinCollection\$(TargetFileName)&quot; --file &quot;$(TargetDir)$(TargetName).pdb=plugins\SkinCollection\$(TargetName).pdb&quot; --remove-loose SkinCollection"
           ContinueOnError="true" StandardOutputImportance="high">
       <Output TaskParameter="ExitCode" PropertyName="DevInstallExitCode" />
     </Exec>

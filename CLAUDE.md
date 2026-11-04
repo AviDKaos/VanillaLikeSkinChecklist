@@ -159,7 +159,8 @@ Requirements:
   see the slot machine section of `docs/game-api.md`), and `SkinMenu.SetText` shrinking labels that would wrap.
 - The manual BepInEx install in the game folder was removed (2026-11-01); the user plays through r2modman. The Default
   profile holds released packages. Test builds go to the **Dev** profile (shared with the other mods; `ProfilePath` in
-  the csproj), and the user launches the Dev profile. Every `dotnet build` runs `tools/r2modman_dev.py`, which installs
+  the csproj), and the user launches the Dev profile. Every `dotnet build` runs `tools/r2modman_import.py` (a copy of the script from
+  the user's `r2modman-mod-dev` Claude Code plugin, `..\r2modman-mod-dev`; improve it there and copy it back), which installs
   the build like r2modman's "Import local mod": the package under `plugins\AviDKaos-VanillaLikeSkinChecklist_Dev\`, plus
   an entry "VanillaLikeSkinChecklist (Dev)" in the profile's `mods.yml` (added once, then its version is updated), so
   the user can toggle it in r2modman. The `_Dev` name lets the released package from Thunderstore be installed in the
