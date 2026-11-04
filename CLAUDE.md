@@ -157,10 +157,15 @@ Requirements:
   Thunderstore team is deprecated, with removal requested, and the personal GitHub repo was deleted.
 - 1.1.0 (published 2026-11-01): per-skin island line from the slot machine pools (`SkinCatalog.SlotMachines`,
   see the slot machine section of `docs/game-api.md`), and `SkinMenu.SetText` shrinking labels that would wrap.
-- The manual BepInEx install in the game folder was removed (2026-11-01); the user plays through r2modman. Test builds
-  go into the r2modman profile by copying `bin/Release/SkinCollection.dll` over
-  `%AppData%\r2modmanPlus-local\HowToFish\profiles\Default\BepInEx\plugins\AviDKaos-VanillaLikeSkinChecklist\SkinCollection\`.
+- The manual BepInEx install in the game folder was removed (2026-11-01); the user plays through r2modman. The Default
+  profile holds released packages; test builds go into the **Dev** profile (shared with the other mods) by copying
+  `bin/Release/SkinCollection.dll` over
+  `%AppData%\r2modmanPlus-local\HowToFish\profiles\Dev\BepInEx\plugins\AviDKaos-VanillaLikeSkinChecklist\SkinCollection\`,
+  and the user launches the Dev profile. Afterwards, reinstall the package in r2modman to go back to the release.
   `CopyToPlugins` only runs when the game folder has a `BepInEx` folder, so builds don't recreate it.
+- Since 2026-11-03 each mod has its own folder and Claude session. This repo's folder was renamed from `HowToFishMod`;
+  the other mod is `..\SlotMachineSkinNames`. Commits carry no Claude attribution lines (the trailer was stripped from
+  the history on 2026-11-03).
 - Upload is manual, by the user: thunderstore.io → How to Fish community → Upload, under their own team (the team
   name becomes the package namespace). Check that the dependency `BepInEx-BepInExPack-5.4.2305` is still the current
   pack there.
