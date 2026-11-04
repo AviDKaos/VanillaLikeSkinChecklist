@@ -1,7 +1,8 @@
 """Install a dev build into an r2modman profile as if it were an imported mod, so r2modman lists it and can toggle it.
 
-Does what r2modman's "Import local mod" does: copies the package to BepInEx/plugins/<namespace>-<name>/ and registers it
-in the profile's mods.yml. Run again on every build to update the files and the listed version. A mod disabled in
+Does what r2modman's "Import local mod" does: copies the package to BepInEx/plugins/<namespace>-<name>_Dev/ and
+registers it in the profile's mods.yml as "<name> (Dev)". The _Dev name lets the released package from Thunderstore
+sit next to it in the same profile; both share the plugin GUID, so only one of them should be enabled at a time. Run again on every build to update the files and the listed version. A mod disabled in
 r2modman has its files renamed to .old; this keeps that state. Any loose copy in plugins/<plugin dir> is removed so the
 same GUID never loads twice.
 
@@ -17,6 +18,8 @@ import shutil
 import sys
 import time
 
+DEV_SUFFIX = "_Dev"
+
 
 def install_file(src, dst, disabled):
     # r2modman disables a mod by appending .old to every file in its folder.
@@ -30,7 +33,7 @@ def yaml_block(text, indent):
     return "\n".join(" " * indent + line for line in text.splitlines())
 
 
-def make_entry(full_name, namespace, manifest, version):
+def make_entry(full_name, namespace, manifest, version, enabled):
     major, minor, patch = version
     deps = manifest.get("dependencies", [])
     dep_lines = "\n".join(f"    - {d}" for d in deps)
@@ -38,7 +41,7 @@ def make_entry(full_name, namespace, manifest, version):
   name: {full_name}
   authorName: {namespace}
   websiteUrl: {manifest.get("website_url", "")}
-  displayName: {manifest["name"]}
+  displayName: {manifest["name"]} (Dev)
   description: >-
 {yaml_block(manifest.get("description", ""), 4)}
   gameVersion: '0'
@@ -55,13 +58,13 @@ def make_entry(full_name, namespace, manifest, version):
     major: {major}
     minor: {minor}
     patch: {patch}
-  enabled: true
+  enabled: {'true' if enabled else 'false'}
   onlineSource: false
   trustedPackage: false
 """.replace("\n\n", "\n")
 
 
-def register(mods_yml, full_name, namespace, manifest, version):
+def register(mods_yml, full_name, namespace, manifest, version, enabled):
     """Adds the entry if it's missing, else updates its version. Returns 'added' or 'updated'."""
     text = open(mods_yml, encoding="utf-8").read() if os.path.exists(mods_yml) else ""
     entries = re.split(r"(?m)^(?=- )", text)
@@ -72,7 +75,7 @@ def register(mods_yml, full_name, namespace, manifest, version):
             entries[i] = entry
             open(mods_yml, "w", encoding="utf-8", newline="\n").write("".join(entries))
             return "updated"
-    entry = make_entry(full_name, namespace, manifest, version)
+    entry = make_entry(full_name, namespace, manifest, version, enabled)
     if text.strip() in ("", "[]"):
         text = entry
     else:
@@ -86,12 +89,18 @@ def main():
     pdb = sys.argv[7] if len(sys.argv) > 7 else None
 
     manifest = json.load(open(os.path.join(ts_dir, "manifest.json"), encoding="utf-8-sig"))
-    full_name = f"{namespace}-{manifest['name']}"
+    full_name = f"{namespace}-{manifest['name']}{DEV_SUFFIX}"
+    release = os.path.join(profile, "BepInEx", "plugins", f"{namespace}-{manifest['name']}")
     version = tuple(int(p) for p in manifest["version_number"].split("."))
     plugins = os.path.join(profile, "BepInEx", "plugins")
     package = os.path.join(plugins, full_name)
     dll_dst = os.path.join(package, plugin_dir, os.path.basename(dll))
-    disabled = os.path.exists(dll_dst + ".old") and not os.path.exists(dll_dst)
+    release_dll = os.path.join(release, plugin_dir, os.path.basename(dll))
+    if os.path.isdir(package):
+        disabled = os.path.exists(dll_dst + ".old") and not os.path.exists(dll_dst)
+    else:
+        # First install: start disabled if the released package is enabled, so the GUID never loads twice.
+        disabled = os.path.exists(release_dll)
 
     install_file(os.path.join(ts_dir, "manifest.json"), os.path.join(package, "manifest.json"), disabled)
     install_file(os.path.join(ts_dir, "icon.png"), os.path.join(package, "icon.png"), disabled)
@@ -105,9 +114,11 @@ def main():
     if os.path.isdir(loose):
         shutil.rmtree(loose)
 
-    state = register(os.path.join(profile, "mods.yml"), full_name, namespace, manifest, version)
+    state = register(os.path.join(profile, "mods.yml"), full_name, namespace, manifest, version, not disabled)
     print(f"r2modman dev install: {full_name} {manifest['version_number']} "
           f"({'disabled' if disabled else 'enabled'}), mods.yml entry {state}")
+    if not disabled and os.path.exists(release_dll):
+        print("WARNING: the released package is enabled in this profile too (same GUID); disable one of them in r2modman.")
     if state == "added":
         print("Select the profile again in r2modman (or restart it) to see the mod in its list.")
 

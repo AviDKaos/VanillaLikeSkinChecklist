@@ -160,12 +160,14 @@ Requirements:
 - The manual BepInEx install in the game folder was removed (2026-11-01); the user plays through r2modman. The Default
   profile holds released packages. Test builds go to the **Dev** profile (shared with the other mods; `ProfilePath` in
   the csproj), and the user launches the Dev profile. Every `dotnet build` runs `tools/r2modman_dev.py`, which installs
-  the build like r2modman's "Import local mod": the package under `plugins\AviDKaos-VanillaLikeSkinChecklist\`, plus an
-  entry in the profile's `mods.yml` (added once, then its version is updated), so the user can toggle it in r2modman.
-  r2modman disables a mod by renaming its files to `.old`; the script keeps that state. It also removes any loose
-  `plugins\SkinCollection\` copy. r2modman only re-reads `mods.yml` when the profile is selected again. Without Python,
-  the build falls back to a loose copy that r2modman doesn't list. Never install the released package in the Dev
-  profile as well, or the same GUID loads twice.
+  the build like r2modman's "Import local mod": the package under `plugins\AviDKaos-VanillaLikeSkinChecklist_Dev\`, plus
+  an entry "VanillaLikeSkinChecklist (Dev)" in the profile's `mods.yml` (added once, then its version is updated), so
+  the user can toggle it in r2modman. The `_Dev` name lets the released package from Thunderstore be installed in the
+  same profile, to switch between release and dev. Both have the same GUID, so only one should be enabled: a new dev
+  entry starts disabled when the release is enabled, and builds warn when both are. r2modman disables a mod by renaming
+  its files to `.old`; the script keeps that state. It also removes any loose `plugins\SkinCollection\` copy. r2modman
+  only re-reads `mods.yml` when the profile is selected again. Without Python, the build falls back to a loose copy
+  that r2modman doesn't list.
 - Since 2026-11-03 each mod has its own folder and Claude session. This repo's folder was renamed from `HowToFishMod`;
   the other mod is `..\SlotMachineSkinNames`. Commits carry no Claude attribution lines (the trailer was stripped from
   the history on 2026-11-03).
