@@ -110,6 +110,15 @@ def main():
     if pdb and os.path.exists(pdb):
         install_file(pdb, os.path.join(package, plugin_dir, os.path.basename(pdb)), disabled)
 
+    # r2modman shows a mod's icon from its download cache (<data>/cache/<mod>/<version>/icon.png), not from the
+    # profile, like an imported zip. Keep only the current version there.
+    cache = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(profile))), "cache", full_name)
+    if os.path.isdir(cache):
+        shutil.rmtree(cache)
+    cached = os.path.join(cache, manifest["version_number"])
+    install_file(os.path.join(ts_dir, "manifest.json"), os.path.join(cached, "manifest.json"), False)
+    install_file(os.path.join(ts_dir, "icon.png"), os.path.join(cached, "icon.png"), False)
+
     loose = os.path.join(plugins, plugin_dir)
     if os.path.isdir(loose):
         shutil.rmtree(loose)
