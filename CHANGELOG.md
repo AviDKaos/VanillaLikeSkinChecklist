@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+- Fixed skins in the menu looking cooked or burnt after cooking an item that was in your inventory.
+
 ## 1.1.0
 
 - Each skin now shows which islands' slot machines can give it, in the line where the fish journal shows the bait. Bow skins only come from the Bow island.

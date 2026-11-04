@@ -8,7 +8,7 @@
     <Nullable>disable</Nullable>
     <!-- The single source of the version: Plugin.cs reads it via the generated PluginInfo, and the
          Thunderstore package target fails if thunderstore/manifest.json disagrees. -->
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <DebugType>portable</DebugType>
     <!-- Record /_/ instead of the local checkout path (e.g. the PDB path inside the DLL). -->
     <Deterministic>true</Deterministic>

@@ -743,9 +743,22 @@ namespace SkinCollection
                 Destroy(_cameraRoot);
             if (_texture != null)
                 _texture.Release();
+            // Materials aren't destroyed with their renderers: the slots' per-renderer instances and our base copies.
+            foreach (var view in _slots)
+            {
+                // No BaseMaterial yet: the renderer still has the journal's own material, which isn't ours to destroy.
+                if (view.Renderer != null && view.BaseMaterial != null && view.Renderer.sharedMaterial != view.BaseMaterial)
+                    Destroy(view.Renderer.sharedMaterial);
+            }
+            if (_itemMaterial != null)
+                Destroy(_itemMaterial);
+            if (_boatMaterial != null)
+                Destroy(_boatMaterial);
             _canvasRoot = null;
             _cameraRoot = null;
             _texture = null;
+            _itemMaterial = null;
+            _boatMaterial = null;
             _slots.Clear();
             _cloudy.Clear();
             _baseFontSizes.Clear();
@@ -813,7 +826,7 @@ namespace SkinCollection
                     var mat = (InventorySlotRendererField?.GetValue(slot) as Renderer)?.sharedMaterial;
                     if (mat != null && (itemShader != null ? mat.shader == itemShader : mat.HasProperty(ShaderManager.UseSkinID)))
                     {
-                        _itemMaterial = mat;
+                        _itemMaterial = CleanCopy(mat, "SkinCollectionItem");
                         break;
                     }
                 }
@@ -825,12 +838,25 @@ namespace SkinCollection
             var boat = SkinCatalog.FindBoat();
             var boatMat = boat != null ? (BoatSkinRendererField?.GetValue(boat) as Renderer)?.sharedMaterial : null;
             if (boatMat != null && (boatShader == null || boatMat.shader == boatShader))
-                _boatMaterial = boatMat;
+                _boatMaterial = CleanCopy(boatMat, "SkinCollectionBoat");
             else if (boatShader != null)
                 _boatMaterial = new Material(boatShader) { name = "SkinCollectionBoat" };
 
             if (_itemMaterial == null)
                 Plugin.Log.LogWarning("No item skin material found; skins will not render");
+        }
+
+        /// <summary>
+        /// Our own copy of a renderer's material. The game's renderers hold per-item instances: InventorySlot sets
+        /// _Cookness on its material to the cookness of the item in that slot. A cooked or burnt item would make
+        /// every skin in the menu look cooked.
+        /// </summary>
+        private static Material CleanCopy(Material source, string name)
+        {
+            var copy = new Material(source) { name = name };
+            if (copy.HasProperty(ShaderManager.CooknessID))
+                copy.SetFloat(ShaderManager.CooknessID, 0f);
+            return copy;
         }
 
         private static T Get<T>(object obj, string field)
